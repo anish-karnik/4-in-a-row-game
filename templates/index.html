@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect 4 Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #difficulty {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #board {
+            display: grid;
+            grid-template-columns: repeat(7, 60px);
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        .cell {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .cell:hover {
+            background-color: #bbb;
+            transform: scale(1.1);
+        }
+        .player-piece {
+            background-color: red;
+        }
+        .ai-piece {
+            background-color: yellow;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <h1>Connect 4 Game</h1>
+    <div>
+        <label for="difficulty">Select Difficulty: </label>
+        <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+    </div>
+    <div id="board"></div>
+    <button onclick="restartGame()">Restart Game</button>
+
+    <script>
+        const boardElement = document.getElementById("board");
+        const difficultyElement = document.getElementById("difficulty");
+
+        difficultyElement.addEventListener("change", () => {
+            const selectedDifficulty = difficultyElement.value;
+            console.log(`Selected difficulty: ${selectedDifficulty}`);
+            fetch('/set_difficulty', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ difficulty: selectedDifficulty })
+            });
+        });
+
+        function createBoard(board) {
+            boardElement.innerHTML = "";
+            for (let r = board.length - 1; r >= 0; r--) {
+                for (let c = 0; c < board[r].length; c++) {
+                    const cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    if (board[r][c] === 1) cell.classList.add("player-piece");
+                    if (board[r][c] === 2) cell.classList.add("ai-piece");
+                    cell.addEventListener("click", () => playerMove(c));
+                    boardElement.appendChild(cell);
+                }
+            }
+        }
+
+        function playerMove(column) {
+            fetch('/player_move', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ column: column })
+            })
+            .then(response => response.json())
+            .then(data => {
+                createBoard(data.board);
+                if (data.winner) {
+                    alert(`${data.winner} wins!`);
+                } else if (data.draw) {
+                    alert("It's a draw!");
+                } else {
+                    aiMove();
+                }
+            });
+        }
+
+        function aiMove() {
+            fetch('/ai_move', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                createBoard(data.board);
+                if (data.winner) {
+                    alert(`AI wins!`);
+                } else if (data.draw) {
+                    alert("It's a draw!");
+                }
+            });
+        }
+
+        function restartGame() {
+            fetch('/restart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => createBoard(data.board));
+        }
+
+        window.onload = () => {
+            fetch('/restart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => createBoard(data.board));
+        };
+    </script>
+</body>
+</html>
