@@ -27,7 +27,7 @@ http://127.0.0.1/
 ### Please click on the following links to see the report and demo video
 
 1. Demo video <link>
-2. Report <link>
+2. Report <[link](https://github.com/anish-karnik/4-in-a-row-game/blob/main/Project%20Report.pdf)>
 
 
 
