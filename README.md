@@ -21,14 +21,19 @@ python app.py
 - Now, the website would be hosted on localhost and accessed via any browser on the device.
 
 ```
-http://127.0.0.1/
+http://127.0.0.1:5000/
 ```
 
 ### Please click on the following links to see the report and demo video
 
-1. Demo video <link>
+1. Demo video  <[link](https://youtu.be/OvOfzgSjkP0?si=v1LHQCsZg9fOQFtn)>
 2. Report <[link](https://github.com/anish-karnik/4-in-a-row-game/blob/main/Project%20Report.pdf)>
 
+### Contributors
+
+1. Ayush Modi
+2. Anish Karnik
+3. Kaushal Kothiya
 
 
 
